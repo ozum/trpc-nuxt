@@ -1,64 +1,82 @@
 {
   "name": "trpc-nuxt",
   "type": "module",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "license": "MIT",
-  "main": "./dist/module.cjs",
-  "types": "./dist/types.d.ts",
+  "sideEffects": false,
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "require": "./dist/module.cjs",
-      "import": "./dist/module.mjs"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
     },
-    "./api": {
-      "types": "./dist/runtime/api.d.ts",
-      "import": "./dist/runtime/api.mjs"
+    "./client": {
+      "require": "./dist/client/index.cjs",
+      "import": "./dist/client/index.mjs"
+    },
+    "./module": {
+      "import": "./module.mjs"
     }
   },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "*.d.ts"
+    "client.d.ts",
+    "module.mjs"
   ],
   "scripts": {
+    "dev": "concurrently \"pnpm build --watch\" \"pnpm --filter playground dev\"",
+    "dev:prepare": "pnpm build && nuxt prepare playground",
     "prepublishOnly": "pnpm build",
-    "build": "nuxt-module-build",
-    "play": "pnpm build && nuxi dev playground",
-    "build:playground": "nuxi build playground",
+    "build": "tsup",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "release": "bumpp --commit --push --tag && npm publish",
-    "prepare": "nuxi prepare playground"
+    "release": "bumpp && npm publish"
   },
   "peerDependencies": {
-    "@trpc/client": "<10.0.0",
-    "@trpc/server": "<10.0.0"
+    "@trpc/client": "^10.0.0-proxy-beta.21",
+    "@trpc/server": "^10.0.0-proxy-beta.21"
   },
   "dependencies": {
-    "@nuxt/kit": "3.0.0-rc.13",
-    "@trpc/client": "^9.27.4",
-    "@trpc/server": "^9.27.4",
-    "dedent": "^0.7.0",
-    "defu": "^6.1.0",
     "h3": "^0.8.6",
+    "nanoid": "^4.0.0",
+    "nuxt": "^3.0.0-rc.13",
     "ohash": "^0.1.5",
-    "pathe": "^0.3.9",
     "ufo": "^0.8.6"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.23.1",
-    "@nuxt/module-builder": "^0.2.0",
-    "@types/dedent": "^0.7.0",
-    "bumpp": "^7.2.0",
+    "@nuxt/kit": "3.0.0-rc.13",
+    "@nuxtjs/eslint-config-typescript": "^11.0.0",
+    "@trpc/client": "10.0.0-rc.7",
+    "@trpc/server": "10.0.0-rc.7",
+    "bumpp": "^8.2.1",
+    "concurrently": "^7.5.0",
     "eslint": "^8.25.0",
-    "nuxt": "3.0.0-rc.13",
-    "trpc-nuxt": "workspace:*",
-    "zod": "^3.19.1"
+    "tsup": "6.4.0",
+    "typescript": "^4.7.4"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "nuxt@3.0.0-rc.13": "patches/nuxt@3.0.0-rc.13.patch"
+    }
   },
   "eslintConfig": {
-    "extends": "@antfu",
+    "extends": [
+      "@nuxtjs/eslint-config-typescript"
+    ],
     "rules": {
-      "no-console": "warn"
+      "@typescript-eslint/no-unused-vars": [
+        "off"
+      ],
+      "vue/multi-word-component-names": "off",
+      "vue/no-multiple-template-root": "off"
     }
-  }
+  },
+  "eslintIgnore": [
+    "*.json",
+    "node_modules",
+    "*.md"
+  ]
 }
